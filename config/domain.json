@@ -1,0 +1,6 @@
+{
+  "service_id": "solar-calibration",
+  "title": "光伏功率预测校准服务",
+  "health_path": "/health",
+  "port": 8080
+}
