@@ -49,16 +49,15 @@ def interpret_timestamp(raw: str, station_tz: ZoneInfo) -> ParsedTimestamp:
         return ParsedTimestamp(dt.astimezone(UTC), TS_OK)
 
     naive = dt
-    first = naive.replace(tzinfo=station_tz, fold=0)
-    second = naive.replace(tzinfo=station_tz, fold=1)
-    utc_first = first.astimezone(UTC)
-    utc_second = second.astimezone(UTC)
-    if utc_first != utc_second:
+    utc_first = naive.replace(tzinfo=station_tz, fold=0).astimezone(UTC)
+    utc_second = naive.replace(tzinfo=station_tz, fold=1).astimezone(UTC)
+    if utc_first == utc_second:
+        return ParsedTimestamp(utc_first, TS_OK)
+    # fold 结果不同：可能是秋季重叠（歧义）或春季缺口（不存在）。
+    # 用回译检验区分——歧义时间能原样译回，不存在的时间译回会漂移。
+    if utc_first.astimezone(station_tz).replace(tzinfo=None) == naive:
         return ParsedTimestamp(utc_first, TS_AMBIGUOUS)
-    # round-trip 检验：不存在的本地时间换算回去会对不上
-    if utc_first.astimezone(station_tz).replace(tzinfo=None) != naive:
-        return ParsedTimestamp(None, TS_NONEXISTENT)
-    return ParsedTimestamp(utc_first, TS_OK)
+    return ParsedTimestamp(None, TS_NONEXISTENT)
 
 
 class SlotGrid:
