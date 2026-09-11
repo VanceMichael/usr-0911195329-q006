@@ -1,6 +1,7 @@
 {
   "service_id": "solar-calibration",
-  "title": "光伏功率预测校准服务",
+  "title": "网络安全宣传活动报名服务",
   "health_path": "/health",
-  "port": 8080
+  "port": 8080,
+  "display_name": "网络安全宣传活动报名服务"
 }
